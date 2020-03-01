@@ -55,6 +55,7 @@ passport.deserializeUser((obj, cb) => cb(null, obj));
 // 3. application root ("/")
 app.get(CALLBACK_URL, passport.authenticate(WebAppStrategy.STRATEGY_NAME, {failureRedirect: '/error'}));
 
+
 // Protect everything under /protected
 app.use("/protected", passport.authenticate(WebAppStrategy.STRATEGY_NAME));
 
@@ -71,8 +72,22 @@ app.get("/logout", (req, res) => {
 
 //Serves the identity token payload
 app.get("/protected/api/idPayload", (req, res) => {
+	console.log("hola 2");
 	res.send(req.session[WebAppStrategy.AUTH_CONTEXT].identityTokenPayload);
+
 });
+
+app.get('/api/user', (req, res)=>{
+	if(req.user){
+		res.json({
+			user:{
+				name: req.user.email
+			}
+		});
+	}else{
+		res.status(401).send("Unauthorized");
+	}
+})
 
 app.get('/error', (req, res) => {
 	res.send('Authentication Error');
